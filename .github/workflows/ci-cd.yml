@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master, main ]
     tags:
       - 'v*'
       - 'beta-*'
@@ -10,9 +10,8 @@ on:
 jobs:
   build-and-deploy-demo:
     runs-on: ubuntu-latest
-    # Run on main branch push (not tags), or if it's a tag we might just want to publish? 
-    # Usually demo is deployed on main push. The example had strict if.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Run on master/main branch push
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     permissions:
       contents: write # Required to push to gh-pages branch
     steps:
