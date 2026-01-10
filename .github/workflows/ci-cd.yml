@@ -89,5 +89,3 @@ jobs:
             --tag ${{ steps.determine-tag.outputs.tag }} \
             --provenance \
             --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
