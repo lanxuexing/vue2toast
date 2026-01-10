@@ -72,6 +72,6 @@
   },
   "homepage": "https://github.com/lanxuexing/vue2toast#readme",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   }
 }
