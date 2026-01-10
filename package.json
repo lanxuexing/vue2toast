@@ -1,35 +1,66 @@
 {
   "name": "@lanxuexing/vue2toast",
   "version": "0.0.7",
-  "description": "this is an information prompt tool on vue",
-  "main": "dist/vue2toast.js",
+  "description": "A lightweight, high-performance Toast notification plugin for Vue 3, built with TypeScript.",
+  "main": "dist/vue2toast.umd.js",
+  "module": "dist/vue2toast.es.js",
+  "types": "dist/index.d.ts",
   "author": "lanxuexing",
+  "license": "MIT",
+  "sideEffects": false,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite serve --config vite.config.demo.mjs",
+    "build": "vite build --config vite.config.js",
+    "build:demo": "vite build --config vite.config.demo.mjs",
+    "preview": "vite preview"
   },
   "keywords": [
-    "toast",
+    "vue",
+    "vue3",
     "vue-toast",
-    "vue2toast",
-    "vue2-toast"
+    "toast",
+    "notification",
+    "message",
+    "alert",
+    "popup",
+    "component",
+    "plugin",
+    "typescript",
+    "ts"
   ],
-  "dependencies": {
-    "vue": "^2.3.4",
-    "webpack": "^3.1.0"
+  "dependencies": {},
+  "peerDependencies": {
+    "vue": "^3.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.2",
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.1",
-    "babel-preset-env": "^1.6.0",
-    "css-loader": "^0.28.4",
-    "node-sass": "^4.5.3",
-    "postcss-loader": "^2.0.6",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.18.2",
-    "uglifyjs-webpack-plugin": "^0.4.6",
-    "vue-loader": "^13.0.1",
-    "vue-template-compiler": "^2.3.4"
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "highlight.js": "^11.11.1",
+    "sass": "^1.83.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vite-plugin-dts": "^4.3.0",
+    "vue": "^3.5.13",
+    "vue-tsc": "^2.1.10"
+  },
+  "overrides": {
+    "minimatch": "^9.0.5"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue2toast.es.js",
+      "require": "./dist/vue2toast.umd.js"
+    },
+    "./style.css": "./dist/style.css"
   },
   "repository": {
     "type": "git",
@@ -40,5 +71,7 @@
     "email": "geziaihuahua@163.com"
   },
   "homepage": "https://github.com/lanxuexing/vue2toast#readme",
-  "license": "MIT"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

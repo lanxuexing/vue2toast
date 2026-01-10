@@ -1,0 +1,94 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+      - 'beta-*'
+
+jobs:
+  build-and-deploy-demo:
+    runs-on: ubuntu-latest
+    # Run on main branch push (not tags), or if it's a tag we might just want to publish? 
+    # Usually demo is deployed on main push. The example had strict if.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write # Required to push to gh-pages branch
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Library
+        run: npm run build
+
+      - name: Build Demo
+        # vite.config.demo.js outputs to 'docs'
+        run: npm run build:demo
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs
+          branch: gh-pages
+
+  publish-to-npm:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      id-token: write # Required for OIDC Trusted Publishing
+      contents: write # Required for creating GitHub Releases
+    outputs:
+      release_tag: ${{ steps.determine-tag.outputs.tag }}
+      is_prerelease: ${{ steps.determine-tag.outputs.is_prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Library
+        run: npm run build
+
+      - name: Determine Release Tag
+        id: determine-tag
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          else
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ steps.determine-tag.outputs.is_prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm (OIDC provenance)
+        run: |
+          npm publish \
+            --tag ${{ steps.determine-tag.outputs.tag }} \
+            --provenance \
+            --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
