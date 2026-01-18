@@ -29,6 +29,8 @@ Check out the component in action: **[https://lanxuexing.github.io/vue2toast/](h
 
 - 🚀 **Vue 3 Optimized**: Built with `createVNode` and `render` for minimal overhead.
 - 📐 **TypeScript Ready**: Full type definitions included.
+- 📚 **Stackable**: Multiple toasts stack automatically without overlapping.
+- 📱 **Responsive**: Auto-resizing width to fit content comfortably.
 - 🎨 **Modern Design**: Clean and accessible UI with smooth animations.
 - 🔄 **Updateable Toasts**: Update message content programmatically (e.g., for progress bars).
 - 📦 **Lightweight**: Zero dependencies, tiny bundle size.
@@ -148,7 +150,7 @@ const showPersist = () => {
 | :--- | :--- | :--- | :--- |
 | `duration` | `number` | `3000` | Duration in ms. Set to `0` to persist indefinitely. |
 | `pauseOnHover` | `boolean` | `true` | Pauses timer when hovering over the toast. |
-| `position` | `'top' \| 'bottom' \| 'center'` | `'center'` | Vertical position of the toast. |
+| `position` | `'top' \| 'bottom' \| 'center'` | `'top'` | Vertical position of the toast. |
 | `zIndex` | `number` | `9999` | Z-Index of the toast container. |
 | `className` | `string` | `''` | Custom CSS class name for the toast content. |
 | `style` | `CSSProperties` | `{}` | Custom inline styles (Vue CSS object). |
@@ -158,6 +160,7 @@ const showPersist = () => {
 
 This repository is powered by Vite.
 
+- **Node.js**: >= 18.0.0 (Required for Vite 6+ / Tailwind 4)
 - **Dev Server**: `npm run dev`
 - **Build Lib**: `npm run build`
 - **Build Demo**: `npm run build:demo`

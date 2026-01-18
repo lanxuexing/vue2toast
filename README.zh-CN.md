@@ -29,6 +29,8 @@
 
 - 🚀 **Vue 3 优化**: 使用 `createVNode` 和 `render` 函数构建，性能极致。
 - 📐 **TypeScript 支持**: 内置完整的类型定义 (d.ts)。
+- 📚 **堆叠显示**: 支持多个 Toast 自动垂直堆叠，不重叠。
+- 📱 **响应式**: 宽度随内容自动调整，适应长文本。
 - 🎨 **现代设计**: 简洁美观的 UI，流畅的动画。
 - 🔄 **支持更新**: 可编程更新 Toast 内容 (适用于进度条、倒计时等)。
 - 📦 **轻量级**: 零依赖，体积极小。
@@ -146,7 +148,7 @@ const showPersist = () => {
 | :--- | :--- | :--- | :--- |
 | `duration` | `number` | `3000` | 显示时长 (ms)。设置为 `0` 则永久显示。 |
 | `pauseOnHover` | `boolean` | `true` | 鼠标悬停时是否暂停倒计时。 |
-| `position` | `'top' \| 'bottom' \| 'center'` | `'center'` | Toast 的垂直显示位置。 |
+| `position` | `'top' \| 'bottom' \| 'center'` | `'top'` | Toast 的垂直显示位置。 |
 | `zIndex` | `number` | `9999` | Toast 容器的层级 (z-index)。 |
 | `className` | `string` | `''` | 自定义 CSS 类名。 |
 | `style` | `CSSProperties` | `{}` | 自定义内联样式对象 (Vue CSS)。 |
@@ -156,6 +158,7 @@ const showPersist = () => {
 
 本项目使用 Vite 构建。
 
+- **Node.js**: >= 18.0.0 (Vite 6+ / Tailwind 4 需要)
 - **启动开发服务器**: `npm run dev`
 - **构建库**: `npm run build`
 - **构建 Demo**: `npm run build:demo`
