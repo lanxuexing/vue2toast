@@ -1,25 +1,26 @@
 <template>
-  <transition name="fade">
-    <section class="toast-container" :class="[`is-${position}`]" :style="{ zIndex: zIndex }" v-if="visible">
-      <div class="toast" :class="customClass" :style="customStyle" @mouseenter="onMouseenter" @mouseleave="onMouseleave">
-        <div v-if="useHtml" v-html="message" class="message-html"></div>
-        <span v-else class="message">{{ message }}</span>
-      </div>
-    </section>
-  </transition>
+  <div 
+    class="toast" 
+    :class="customClass" 
+    :style="customStyle"
+    @mouseenter="$emit('mouseenter')" 
+    @mouseleave="$emit('mouseleave')"
+  >
+    <div v-if="useHtml" v-html="message" class="message-html"></div>
+    <span v-else class="message">{{ message }}</span>
+    
+    <!-- Optional close button if we want one later, but for now click to close is common or just timer -->
+    <!-- <button class="close-btn" @click="$emit('close')">&times;</button> -->
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, PropType, CSSProperties } from 'vue';
+import { PropType, CSSProperties } from 'vue';
 
 defineProps({
-  zIndex: {
-    type: Number,
-    default: 9999
-  },
-  position: {
+  message: {
     type: String,
-    default: 'center' // 'top' | 'bottom' | 'center'
+    required: true
   },
   useHtml: {
     type: Boolean,
@@ -32,81 +33,43 @@ defineProps({
   customStyle: {
     type: Object as PropType<CSSProperties>,
     default: () => ({})
+  },
+  type: {
+    type: String,
+    default: 'info'
   }
 });
 
-const visible = ref(false);
-const message = ref("");
-
-const emit = defineEmits(['mouseenter', 'mouseleave']);
-
-const onMouseenter = () => emit('mouseenter');
-const onMouseleave = () => emit('mouseleave');
-
-defineExpose({
-  visible,
-  message
-});
+defineEmits(['mouseenter', 'mouseleave', 'close']);
 </script>
 
 <style lang='scss' scoped>
-.toast-container {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
+.toast {
   display: flex;
+  align-items: center;
   justify-content: center;
-  pointer-events: none; // Allow clicking through
+  min-width: 200px;
+  max-width: 400px;
+  padding: 12px 24px;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  color: white;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: default;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  word-break: break-word;
 
-  // Positions
-  &.is-center {
-    align-items: center;
-  }
-  
-  &.is-top {
-    align-items: flex-start;
-    padding-top: 60px;
-  }
-  
-  &.is-bottom {
-    align-items: flex-end;
-    padding-bottom: 60px;
-  }
-
-  .toast {
-    width: 180px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.61);
-    border-radius: 10px;
-    color: white;
-    pointer-events: auto; // Re-enable pointer events on the toast itself
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: default;
-
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
 
   .message {
-    font-size: 14px;
     color: #fff;
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: scale(0.7);
 }
 </style>

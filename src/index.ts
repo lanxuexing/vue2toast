@@ -1,5 +1,5 @@
 import { createVNode, render, App, CSSProperties, inject } from 'vue';
-import ToastComponent from './components/Toast.vue';
+import ToastComponent from './components/ToastContainer.vue';
 
 export interface ToastOptions {
     /**
@@ -69,11 +69,14 @@ const Toast = {
             duration: 3000,
             pauseOnHover: true,
             zIndex: 9999,
-            position: 'center',
+            position: 'top', // Changed default to top as it's more standard for stacks, but center is fine too. Let's stick to center to match old default if possible, but stack usually implies top/bottom. Let's use 'top' as default for modern feel.
             useHtml: false,
         };
 
         Object.assign(globalOpt, options);
+
+        // Cache for containers by position
+        const containers = new Map<string, any>();
 
         const showToast: ShowToast = (message: string, options?: ToastOptions | (() => void)): ToastInstance => {
             let localOpt: ToastOptions = { ...globalOpt };
@@ -85,81 +88,43 @@ const Toast = {
                 callback = options;
             }
 
-            // SSR Guard: If document is undefined (server-side), return a no-op instance.
             if (typeof document === 'undefined') {
-                return {
-                    close: () => { },
-                    update: () => { }
-                };
+                return { close: () => { }, update: () => { } };
             }
 
-            const container = document.createElement('div');
-            document.body.appendChild(container);
+            // Ensure valid position
+            const position = localOpt.position || 'top';
 
-            let timer: any = null;
+            // Get or create container for this position
+            let containerInstance = containers.get(position);
 
-            const startTimer = () => {
-                if (localOpt.duration && localOpt.duration > 0) {
-                    timer = setTimeout(() => {
-                        close();
-                    }, localOpt.duration);
-                }
-            };
+            if (!containerInstance) {
+                const containerEl = document.createElement('div');
+                document.body.appendChild(containerEl);
 
-            const clearTimer = () => {
-                if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
-                }
-            };
+                const vm = createVNode(ToastComponent, {
+                    position: position,
+                    zIndex: localOpt.zIndex
+                });
 
-            let vm = createVNode(ToastComponent, {
-                zIndex: localOpt.zIndex,
-                position: localOpt.position,
-                useHtml: localOpt.useHtml,
-                customClass: localOpt.className,
-                customStyle: localOpt.style,
-                onMouseenter: () => {
-                    if (localOpt.pauseOnHover) clearTimer();
-                },
-                onMouseleave: () => {
-                    if (localOpt.pauseOnHover) startTimer();
-                }
+                // Inherit app context
+                vm.appContext = app._context;
+
+                render(vm, containerEl);
+
+                // Expose the component instance
+                containerInstance = vm.component?.exposed;
+                containers.set(position, containerInstance);
+            }
+
+            // Add toast to container
+            // The container's add method returns a handle with close/update
+            const instance = containerInstance.add(message, {
+                ...localOpt,
+                onClose: callback
             });
 
-            // Best Practice: Inherit AppContext
-            // This allows the toast component to access global properties, plugins, and dependency injection from the main app.
-            vm.appContext = app._context;
-
-            render(vm, container);
-
-            const instance = vm.component?.exposed as { visible: { value: boolean }, message: { value: string } } | undefined;
-
-            if (instance) {
-                instance.message.value = message;
-                instance.visible.value = true;
-            }
-
-            const close = () => {
-                if (instance) instance.visible.value = false;
-                clearTimer();
-                setTimeout(() => {
-                    if (container && container.parentNode) {
-                        render(null, container);
-                        container.parentNode.removeChild(container);
-                    }
-                    if (callback) callback();
-                }, 300);
-            };
-
-            startTimer();
-
-            return {
-                close,
-                update: (newMessage: string) => {
-                    if (instance) instance.message.value = newMessage;
-                }
-            };
+            return instance;
         }
 
         app.config.globalProperties.$toast = showToast;
